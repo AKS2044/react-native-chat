@@ -1,16 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import MainScreen from "./screens/MainScreen";
-import LoginScreen from "./screens/LoginScreen";
-import RegisterScreen from "./screens/RegisterScreen";
-import ProfileScreen from "./screens/ProfileScreen";
-
-type RootStackParamList = {
-  Main: undefined;
-  Login: undefined;
-  Register: undefined;
-  Profile: undefined;
-};
+import MainScreen from "../screens/MainScreen";
+import LoginScreen from "../screens/LoginScreen";
+import RegisterScreen from "../screens/RegisterScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import { RootStackParamList } from "./types";
+import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -37,6 +32,11 @@ export const Navigation = () => {
           name="Profile"
           component={ProfileScreen}
           options={{ title: "Profile" }}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{ title: "Chat" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

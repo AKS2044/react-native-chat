@@ -33,7 +33,6 @@ const SumbitPressable = styled.Pressable`
   align-items: center;
   justify-content: center;
   border-width: 1px;
-  border-style: solid;
   border-color: ${COLORS.gray};
   border-radius: 4px;
   width: 49%;
@@ -48,7 +47,7 @@ const SumbitText = styled.Text`
 
 const MainScreen = () => {
   const { navigate } = useNavigation();
-  const [isAuth, SetIsAuth] = useState(false);
+  const [isAuth, SetIsAuth] = useState(true);
   return (
     <MainView>
       <WelcomeText>Welcome to the react chat app</WelcomeText>
