@@ -1,77 +1,93 @@
-import React from "react";
+import React, { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../constants/colors";
-import styled from "styled-components/native";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
-import { InputProps } from "./types/types";
-
-const LoginView = styled.View`
-  flex: 1;
-  background: ${COLORS.primary};
-`;
-
-const SubtitleView = styled.View`
-  flex-wrap: wrap;
-`;
-
-const SubtitleText = styled.Text`
-  margin-top: 20px;
-  font-weight: 300;
-  color: ${COLORS.white};
-`;
-
-const SubtitleLinkText = styled.Text`
-  color: ${COLORS.pink};
-  text-decoration: underline;
-`;
-
-const BlockView = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-`;
-
-const TitleText = styled.Text`
-  color: ${COLORS.white};
-  margin-bottom: 25px;
-  font-size: 30px;
-  font-weight: 700;
-`;
-
-const SumbitButton = styled.Button`
-  align-items: center;
-  justify-content: center;
-  width: 40%;
-  height: 40px;
-  background: ${COLORS.secondary};
-`;
-
-const InputText = styled.TextInput.attrs((props: InputProps) => ({
-  secureTextEntry: props.password ? true : false,
-  placeholderTextColor: COLORS.lightGray,
-}))`
-  color: ${COLORS.white};
-  font-size: 18px;
-  margin-bottom: 15px;
-  padding-right: 10px;
-  padding-left: 10px;
-  background: ${COLORS.secondary};
-  border: 1px;
-  border-style: solid;
-  border-color: ${COLORS.pink};
-  border-radius: 4px;
-  width: 80%;
-  height: 50px;
-`;
+import {
+  BlockView,
+  LoginView,
+  SubtitleLinkText,
+  SubtitleText,
+  SubtitleView,
+  SumbitButton,
+  TitleText,
+} from "./Styles/LoginStyle";
+import Input from "../components/input/Input";
+import { useSelector } from "react-redux";
+import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
+import { useAppDispatch } from "../redux/store";
+import { fetchLogin } from "../redux/Auth/asyncActions";
+import { LoginParams } from "../redux/Auth/types";
+import { TextInput } from "react-native";
 
 const LoginScreen = () => {
   const { navigate } = useNavigation();
+  const isAuth = useSelector(selectIsAuth);
+  const dispatch = useAppDispatch();
+
+  const { data, statusLogin, error } = useSelector(selectLoginData);
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<LoginParams>({
+    mode: "onChange",
+  });
+
+  // const onSubmit = async (values: LoginParams) => {
+  //   await dispatch(fetchLogin(values));
+  // };
+
+  const onSubmit = (data: LoginParams) => console.log(data);
+
+  const storeData = async () => {
+    try {
+      await AsyncStorage.setItem("token", String(data.token));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  if (data.token) {
+    storeData();
+  }
+
+  // useEffect(() => {
+  //   if (statusLogin === "completed") {
+  //     instance.defaults.headers.common["Authorization"] =
+  //       window.localStorage.getItem("token");
+  //   }
+  // }, [statusLogin]);
+  if (isAuth) {
+    return navigate("Profile");
+  }
   return (
     <LoginView>
       <BlockView>
         <TitleText>Log in</TitleText>
-        <InputText placeholder="Login" />
-        <InputText placeholder="Password" password />
-        <SumbitButton title="Log in" color={COLORS.pink} disabled={false} />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput placeholder="Login" value={value} />
+          )}
+          name="userName"
+        />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput placeholder="Password" secureTextEntry value={value} />
+          )}
+          name="password"
+        />
+        <SumbitButton
+          onPress={handleSubmit(onSubmit)}
+          title="Log in"
+          color={COLORS.pink}
+          disabled={false}
+        />
         <SubtitleView>
           <SubtitleText>
             Registration:{" "}
