@@ -15,7 +15,7 @@ export const fetchLogin = createAsyncThunk<
   { rejectValue: { message: string }[] }
 >("login/fetchLoginStatus", async (params, { rejectWithValue }) => {
   const { userName, password, rememberMe } = params;
-  console.log(params, "params");
+  console.log(params);
   try {
     const { data } = await axios.post<LoginPayloadParams>("/User/login", {
       userName,

@@ -18,7 +18,6 @@ import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
 import { useAppDispatch } from "../redux/store";
 import { fetchLogin } from "../redux/Auth/asyncActions";
 import { LoginParams } from "../redux/Auth/types";
-import { TextInput } from "react-native";
 
 const LoginScreen = () => {
   const { navigate } = useNavigation();
@@ -35,11 +34,9 @@ const LoginScreen = () => {
     mode: "onChange",
   });
 
-  // const onSubmit = async (values: LoginParams) => {
-  //   await dispatch(fetchLogin(values));
-  // };
-
-  const onSubmit = (data: LoginParams) => console.log(data);
+  const onSubmit = async (values: LoginParams) => {
+    await dispatch(fetchLogin(values));
+  };
 
   const storeData = async () => {
     try {
@@ -70,7 +67,12 @@ const LoginScreen = () => {
           control={control}
           rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput placeholder="Login" value={value} />
+            <Input
+              placeholder="Login"
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+            />
           )}
           name="userName"
         />
@@ -78,7 +80,13 @@ const LoginScreen = () => {
           control={control}
           rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput placeholder="Password" secureTextEntry value={value} />
+            <Input
+              placeholder="Password"
+              secureTextEntry={true}
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+            />
           )}
           name="password"
         />

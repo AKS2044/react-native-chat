@@ -6,9 +6,9 @@ import {
   TextInputChangeEventData,
   TextInputFocusEventData,
 } from "react-native";
+import { Noop } from "react-hook-form";
 
-export const InputText = styled.TextInput.attrs((props: InputProps) => ({
-  secureTextEntry: props.password ? true : false,
+export const InputText = styled.TextInput.attrs(() => ({
   placeholderTextColor: COLORS.lightGray,
 }))`
   color: ${COLORS.white};
@@ -26,18 +26,28 @@ export const InputText = styled.TextInput.attrs((props: InputProps) => ({
 `;
 
 type InputProps = {
-  password?: string;
+  secureTextEntry?: Boolean | undefined;
   placeholder: string;
   value: string;
   isAuth?: Boolean;
+  onBlur?: Noop;
+  onChange?: (...event: any[]) => void;
 };
 
-const Input: React.FC<InputProps> = ({ password, placeholder, value }) => {
+const Input: React.FC<InputProps> = ({
+  placeholder,
+  value,
+  secureTextEntry,
+  onBlur,
+  onChange,
+}) => {
   return (
     <InputText
       placeholder={placeholder}
-      secureTextEntry={password ? true : false}
+      secureTextEntry={secureTextEntry ? true : false}
       value={value}
+      onBlur={onBlur}
+      onChangeText={onChange}
     />
   );
 };
