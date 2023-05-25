@@ -1,11 +1,6 @@
 import React from "react";
 import styled from "styled-components/native";
 import { COLORS } from "../../constants/colors";
-import {
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
-  TextInputFocusEventData,
-} from "react-native";
 import { Noop } from "react-hook-form";
 
 export const InputText = styled.TextInput.attrs(() => ({

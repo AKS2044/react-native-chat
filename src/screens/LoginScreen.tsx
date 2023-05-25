@@ -18,6 +18,7 @@ import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
 import { useAppDispatch } from "../redux/store";
 import { fetchLogin } from "../redux/Auth/asyncActions";
 import { LoginParams } from "../redux/Auth/types";
+import Alert from "../components/alert/Alert";
 
 const LoginScreen = () => {
   const { navigate } = useNavigation();
@@ -63,6 +64,7 @@ const LoginScreen = () => {
     <LoginView>
       <BlockView>
         <TitleText>Log in</TitleText>
+        <Alert typeAlert="warning">Туту ошибка</Alert>
         <Controller
           control={control}
           rules={{ required: true }}
