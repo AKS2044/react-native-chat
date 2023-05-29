@@ -3,6 +3,8 @@ import { COLORS } from "../../constants/colors";
 
 export const LoginView = styled.View`
   flex: 1;
+  align-items: center;
+  justify-content: center;
   background: ${COLORS.primary};
 `;
 
@@ -22,7 +24,7 @@ export const SubtitleLinkText = styled.Text`
 `;
 
 export const BlockView = styled.View`
-  flex: 1;
+  width: 100%;
   align-items: center;
   justify-content: center;
 `;

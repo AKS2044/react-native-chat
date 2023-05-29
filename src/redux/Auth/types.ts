@@ -11,12 +11,17 @@ export interface LoginState {
   statusLogin: Status;
   statusAuth: Status;
   statusRegister: Status;
+  statusLogout: Status;
 }
 
 export interface LoginParams {
   userName: string;
   password: string;
   rememberMe?: boolean;
+}
+
+export interface LogoutParams {
+  userName: string;
 }
 
 export interface ErrorParams {

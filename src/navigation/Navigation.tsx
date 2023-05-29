@@ -6,13 +6,28 @@ import RegisterScreen from "../screens/RegisterScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { RootStackParamList } from "./types";
 import ChatScreen from "../screens/ChatScreen";
+import { COLORS } from "../constants/colors";
+import { useAppDispatch } from "../redux/store";
+import { useSelector } from "react-redux";
+import { selectLoginData } from "../redux/Auth/selectors";
+import { fetchAuth } from "../redux/Auth/asyncActions";
+import { useEffect } from "react";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const Navigation = () => {
+  const dispatch = useAppDispatch();
+  const { statusLogin, statusRegister } = useSelector(selectLoginData);
+
+  useEffect(() => {
+    dispatch(fetchAuth());
+  }, [statusLogin, statusRegister]);
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
+      <Stack.Navigator
+        screenOptions={{ headerStyle: { backgroundColor: COLORS.pink } }}
+        initialRouteName="Main"
+      >
         <Stack.Screen
           name="Main"
           component={MainScreen}

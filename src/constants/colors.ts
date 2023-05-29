@@ -2,13 +2,14 @@ export const COLORS = {
   primary: "#282639",
   secondary: "#3a384c",
 
-  white: "#fff",
+  white: "#ffffff",
   pink: "#f47b7b",
   green: "#37E39F",
   red: "#F9A8BA",
   gray: "#4e4c64",
   lightGray: "#dbdbdb",
-  lightGray1: "#f5f6fa",
+  lightGray1: "#666481",
+  bgModal: "#00000051",
 
   //Alert colors
   error: "#d64242",

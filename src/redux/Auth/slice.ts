@@ -6,6 +6,7 @@ import {
   fetchAuth,
   fetchGetProfile,
   fetchUploadPhoto,
+  fetchLogout,
 } from "./asyncActions";
 import {
   LoginState,
@@ -25,6 +26,7 @@ const initialState: LoginState = {
   statusLogin: Status.LOADING,
   statusAuth: Status.LOADING,
   statusRegister: Status.LOADING,
+  statusLogout: Status.LOADING,
 };
 
 export const loginSlice = createSlice({
@@ -60,6 +62,18 @@ export const loginSlice = createSlice({
       state.statusRegister = Status.ERROR;
       state.data = {} as LoginPayloadParams;
       state.error = action.payload ? action.payload : [];
+    });
+
+    // fetchLogout builder
+    builder.addCase(fetchLogout.pending, (state) => {
+      state.statusLogout = Status.LOADING;
+    });
+    builder.addCase(fetchLogout.fulfilled, (state) => {
+      state.statusLogout = Status.SUCCESS;
+      state.data = {} as LoginPayloadParams;
+    });
+    builder.addCase(fetchLogout.rejected, (state) => {
+      state.statusLogout = Status.ERROR;
     });
 
     // fetchAuth builder

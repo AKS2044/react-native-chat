@@ -34,6 +34,10 @@ export interface ChatParams {
 export interface AddChatParams {
   nameChat: string;
 }
+
+export interface SearchParams {
+  search: string;
+}
 export interface UsersChatPayloadParams {
   id: string;
   email: string;

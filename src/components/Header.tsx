@@ -3,7 +3,12 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS } from "../constants/colors";
 import logout from "../images/logout.png";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
+import { useAppDispatch } from "../redux/store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+import { selectIsAuth } from "../redux/Auth/selectors";
+import { fetchLogout } from "../redux/Auth/asyncActions";
 
 const HeaderView = styled.View`
   padding-right: 10px;
@@ -45,25 +50,46 @@ const HeaderLink = styled.Text`
 `;
 
 type HeaderProps = {
-  userName?: string;
+  userName: string;
   chatName?: string;
 };
 
 const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
   const { navigate } = useNavigation();
-  const [auth, setAuth] = useState(true);
+  const dispatch = useAppDispatch();
+  const isAuth = useSelector(selectIsAuth);
+  const logoutSite = async () => {
+    Alert.alert("Warning", "Do you really want to leave the chat?", [
+      {
+        text: "NO",
+      },
+      {
+        text: "YES",
+        onPress: async () => {
+          await AsyncStorage.removeItem("token");
+          await dispatch(fetchLogout({ userName: userName }));
+          navigate("Main");
+        },
+      },
+    ]);
+  };
+
   return (
     <HeaderView>
-      <HeaderLogo>React Chat</HeaderLogo>
-      {auth ? (
+      <TouchableOpacity onPress={() => navigate("Main")}>
+        <HeaderLogo>React Chat</HeaderLogo>
+      </TouchableOpacity>
+      {isAuth ? (
         <HeaderLinks>
-          <TouchableOpacity onPress={() => navigate("Profile")}>
+          <TouchableOpacity
+            onPress={() => navigate("Profile", { userName: userName })}
+          >
             <HeaderLink>Profile</HeaderLink>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigate("Main")}>
             <HeaderLink>{chatName}</HeaderLink>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate("Profile")}>
+          <TouchableOpacity onPress={() => logoutSite()}>
             <HeaderImage source={logout} />
           </TouchableOpacity>
         </HeaderLinks>

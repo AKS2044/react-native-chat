@@ -5,6 +5,7 @@ import {
   ErrorParams,
   LoginParams,
   LoginPayloadParams,
+  LogoutParams,
   ProfilePayloadParams,
   RegisterParams,
 } from "./types";
@@ -15,7 +16,6 @@ export const fetchLogin = createAsyncThunk<
   { rejectValue: { message: string }[] }
 >("login/fetchLoginStatus", async (params, { rejectWithValue }) => {
   const { userName, password, rememberMe } = params;
-  console.log(params);
   try {
     const { data } = await axios.post<LoginPayloadParams>("/User/login", {
       userName,
@@ -76,6 +76,14 @@ export const fetchUploadPhoto = createAsyncThunk<string, FormData>(
   "login/fetchUploadPhotoStatus",
   async (formData) => {
     const { data } = await axios.post("/User/uploadPhoto", formData);
+    return data;
+  }
+);
+
+export const fetchLogout = createAsyncThunk<string, LogoutParams>(
+  "login/fetchLogoutStatus",
+  async (params) => {
+    const { data } = await axios.post("/User/logout", params);
     return data;
   }
 );

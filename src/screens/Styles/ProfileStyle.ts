@@ -46,6 +46,19 @@ export const TitleText = styled.Text`
   font-weight: 700;
 `;
 
+export const InputChat = styled.TextInput`
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 16px;
+  height: 50px;
+  width: 100%;
+  border-radius: 8px;
+  background: ${COLORS.gray};
+  border-width: 1px;
+  border-color: ${COLORS.lightGray1};
+  color: ${COLORS.white};
+`;
+
 export const TitleBlockView = styled.View`
   color: ${COLORS.white};
   background: ${COLORS.pink};
@@ -81,32 +94,10 @@ export const ChatsView = styled.View`
   flex: 1;
 `;
 
-export const ChatItemView = styled.View`
-  align-items: center;
-  justify-content: space-between;
-  background: ${COLORS.secondary};
-  border-bottom-width: 1px;
-  border-bottom-color: ${COLORS.primary};
-  flex-direction: row;
-  padding: 5px;
-`;
-export const ChatItemText = styled.Text`
-  color: ${COLORS.white};
-  font-size: 16px;
-`;
-
 export const PhotoUser = styled.Image`
   border-width: 1px;
   border-color: ${COLORS.pink};
   border-radius: 150px;
   width: 130px;
   height: 130px;
-`;
-
-export const PhotoChat = styled.Image`
-  border-width: 1px;
-  border-color: ${COLORS.pink};
-  border-radius: 150px;
-  width: 64px;
-  height: 64px;
 `;

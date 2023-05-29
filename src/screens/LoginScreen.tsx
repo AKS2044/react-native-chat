@@ -19,6 +19,8 @@ import { useAppDispatch } from "../redux/store";
 import { fetchLogin } from "../redux/Auth/asyncActions";
 import { LoginParams } from "../redux/Auth/types";
 import Alert from "../components/alert/Alert";
+import { FlatList } from "react-native";
+import instance from "../axios";
 
 const LoginScreen = () => {
   const { navigate } = useNavigation();
@@ -34,12 +36,11 @@ const LoginScreen = () => {
   } = useForm<LoginParams>({
     mode: "onChange",
   });
-
   const onSubmit = async (values: LoginParams) => {
     await dispatch(fetchLogin(values));
   };
 
-  const storeData = async () => {
+  const setStoreData = async () => {
     try {
       await AsyncStorage.setItem("token", String(data.token));
     } catch (e) {
@@ -47,24 +48,39 @@ const LoginScreen = () => {
     }
   };
 
-  if (data.token) {
-    storeData();
-  }
+  const getStoreData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      instance.defaults.headers.common["Authorization"] = token;
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  // useEffect(() => {
-  //   if (statusLogin === "completed") {
-  //     instance.defaults.headers.common["Authorization"] =
-  //       window.localStorage.getItem("token");
-  //   }
-  // }, [statusLogin]);
+  useEffect(() => {
+    if (statusLogin === "completed") {
+      if (data.token) {
+        setStoreData();
+        getStoreData();
+      }
+    }
+  }, [statusLogin]);
+
   if (isAuth) {
-    return navigate("Profile");
+    return navigate("Profile", { userName: data.userName });
   }
   return (
     <LoginView>
       <BlockView>
         <TitleText>Log in</TitleText>
-        <Alert typeAlert="warning">Туту ошибка</Alert>
+        {statusLogin === "error" && (
+          <FlatList
+            data={error}
+            renderItem={({ item }) => (
+              <Alert typeAlert="error">{item.message}</Alert>
+            )}
+          />
+        )}
         <Controller
           control={control}
           rules={{ required: true }}

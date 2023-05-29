@@ -1,5 +1,6 @@
 import styled from "styled-components/native";
 import { COLORS } from "../../../constants/colors";
+import { GestureResponderEvent } from "react-native";
 
 const ButtonPressable = styled.Pressable`
   align-items: center;
@@ -19,11 +20,12 @@ type ButtonProps = {
   disabled?: boolean;
   children: string;
   width?: string;
+  onPress?: (event: GestureResponderEvent) => void;
 };
 
-const Button: React.FC<ButtonProps> = ({ children, width }) => {
+const Button: React.FC<ButtonProps> = ({ children, width, onPress }) => {
   return (
-    <ButtonPressable style={{ width }}>
+    <ButtonPressable onPress={onPress} style={{ width }}>
       <ButtonText>{children}</ButtonText>
     </ButtonPressable>
   );
