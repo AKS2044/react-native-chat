@@ -1,4 +1,4 @@
-import React, { Ref, RefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Button from "../components/ui/button/Button";
 import {
@@ -31,7 +31,7 @@ import { useSelector } from "react-redux";
 import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
 import { selectChatData } from "../redux/Chat/selectors";
 import { RootStackParamList } from "../navigation/types";
-import { fetchGetProfile } from "../redux/Auth/asyncActions";
+import { fetchGetProfile, fetchUploadPhoto } from "../redux/Auth/asyncActions";
 import {
   fetchChatsUser,
   fetchCreateChat,
@@ -43,9 +43,12 @@ import { AddChatParams, SearchParams } from "../redux/Chat/types";
 import ItemChat from "../components/itemChat/ItemChat";
 import Modal from "../components/modal/Modal";
 import { COLORS } from "../constants/colors";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 
 const ProfileScreen = () => {
   const uri = instance.getUri().slice(0, -4);
+  const formData = new FormData();
   const dispatch = useAppDispatch();
   const isAuth = useSelector(selectIsAuth);
   const { profile, profileStatus, data, statusAuth, statusLogout } =
@@ -53,9 +56,7 @@ const ProfileScreen = () => {
   const {
     userChats,
     statusAddChat,
-    statusUserChats,
     searchChat,
-    statusSearchChat,
     statusEnterChat,
     statusLeaveChat,
   } = useSelector(selectChatData);
@@ -65,7 +66,7 @@ const ProfileScreen = () => {
     control,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<SearchParams>({
+  } = useForm({
     mode: "onChange",
   });
 
@@ -74,9 +75,37 @@ const ProfileScreen = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [timer, setTimer] = useState(false);
   const [modal, setModal] = useState(false);
+  const [modalPhoto, setModalPhoto] = useState(false);
   const [search, setSearch] = useState("");
   const [addChat, setAddChat] = useState("");
   const { navigate } = useNavigation();
+
+  const UploadFile = async () => {
+    try {
+      let result = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: false,
+        type: "image/*",
+      });
+      if (result.type === "success") {
+        let file = result.file;
+        if (file != null) formData.append("file", file);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getBlob = async (fileUri: string) => {
+    try {
+      const resp = await fetch(fileUri);
+      const imageBody = await resp.blob();
+      return imageBody;
+    } catch (err) {}
+  };
+
+  const onSubmit = async () => {
+    await dispatch(fetchUploadPhoto(formData));
+  };
 
   const getProfile = async () => {
     if (userName) {
@@ -108,6 +137,7 @@ const ProfileScreen = () => {
       console.log(e);
     }
   };
+
   // const dataRefresh = () => {
   //   SetTimer(true);
   //   const timer = setTimeout(() => {
@@ -120,13 +150,13 @@ const ProfileScreen = () => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
-        setKeyboardVisible(true); // or some other action
+        setKeyboardVisible(true);
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
-        setKeyboardVisible(false); // or some other action
+        setKeyboardVisible(false);
       }
     );
 
@@ -147,11 +177,11 @@ const ProfileScreen = () => {
   }, [search]);
 
   if (timer) {
-    return <Loader />;
+    <Loader />;
   }
-  console.log(isKeyboardVisible);
+
   if (!isAuth) {
-    return navigate("Login");
+    navigate("Login");
   }
   return (
     <>
@@ -174,6 +204,24 @@ const ProfileScreen = () => {
                 </>
               }
               title="Enter the name chat"
+            ></Modal>
+          )}
+          {modalPhoto && (
+            <Modal
+              element={
+                <>
+                  <SearchCross onPress={() => setModalPhoto(!modalPhoto)}>
+                    ⛌
+                  </SearchCross>
+                  <Button onPress={() => UploadFile()} width="49%">
+                    Select
+                  </Button>
+                  <Button onPress={() => onSubmit()} width="49%">
+                    Upload
+                  </Button>
+                </>
+              }
+              title="Change your avatar"
             ></Modal>
           )}
           <Header userName={data.userName} />
@@ -207,7 +255,9 @@ const ProfileScreen = () => {
             <Button onPress={() => setModal(!modal)} width="49%">
               Create chat
             </Button>
-            <Button width="49%">Change photo</Button>
+            <Button onPress={() => setModalPhoto(!modalPhoto)} width="49%">
+              Change photo
+            </Button>
           </ButtonsView>
           <TitleBlockView>
             <TitleText>My chats</TitleText>
@@ -244,7 +294,12 @@ const ProfileScreen = () => {
                 refreshControl={<RefreshControl refreshing={timer} />}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    onPress={() => navigate("Chat", { chatId: item.id })}
+                    onPress={() =>
+                      navigate("Chat", {
+                        chatId: item.id,
+                        chatName: item.nameChat,
+                      })
+                    }
                   >
                     <ItemChat
                       nameChat={item.nameChat}
@@ -261,7 +316,12 @@ const ProfileScreen = () => {
                 refreshControl={<RefreshControl refreshing={timer} />}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    onPress={() => navigate("Chat", { chatId: item.id })}
+                    onPress={() =>
+                      navigate("Chat", {
+                        chatId: item.id,
+                        chatName: item.nameChat,
+                      })
+                    }
                   >
                     <ItemChat
                       nameChat={item.nameChat}

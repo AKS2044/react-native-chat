@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components/native";
 import { COLORS } from "../../constants/colors";
 import { ChatParams } from "../../redux/Chat/types";
-import Button from "../ui/button/Button";
 
 const ChatItemView = styled.View`
   align-items: center;
@@ -33,14 +32,13 @@ const PhotoChat = styled.Text`
   height: 64px;
 `;
 
-const ItemChat: React.FC<ChatParams> = ({ dateCreat, nameChat }) => {
+const ItemChat: React.FC<ChatParams> = ({ dateCreat, nameChat, id }) => {
   const photoChat = nameChat[0] + nameChat[nameChat.length - 1];
   return (
-    <ChatItemView>
+    <ChatItemView key={id}>
       <PhotoChat>{photoChat}</PhotoChat>
       <ChatItemText>{nameChat}</ChatItemText>
       <ChatItemText>{dateCreat}</ChatItemText>
-      <Button width="20%">Leave</Button>
     </ChatItemView>
   );
 };

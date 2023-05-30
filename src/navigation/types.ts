@@ -5,7 +5,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Profile: { userName: string };
-  Chat: { chatId: number };
+  Chat: { chatId: number; chatName: string };
 };
 
 export type RootRouteProps<RouteName extends keyof RootStackParamList> =

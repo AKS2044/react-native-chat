@@ -1,5 +1,4 @@
 import styled from "styled-components/native";
-import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS } from "../constants/colors";
 import logout from "../images/logout.png";

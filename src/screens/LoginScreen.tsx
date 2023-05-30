@@ -67,7 +67,7 @@ const LoginScreen = () => {
   }, [statusLogin]);
 
   if (isAuth) {
-    return navigate("Profile", { userName: data.userName });
+    navigate("Profile", { userName: data.userName });
   }
   return (
     <LoginView>

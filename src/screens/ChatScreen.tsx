@@ -5,7 +5,7 @@ import { RootRouteProps } from "../navigation/types";
 import photoUser from "../images/RickMorti8.png";
 import smile from "../images/smiling.png";
 import Button from "../components/ui/button/Button";
-import { FlatList, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import {
   ChatView,
   DateText,
