@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader/Loader";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -67,7 +66,7 @@ const ProfileScreen = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const route = useRoute<RouteProp<RootStackParamList, "Profile">>();
@@ -83,27 +82,22 @@ const ProfileScreen = () => {
   const UploadFile = async () => {
     try {
       let result = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: false,
+        copyToCacheDirectory: true,
         type: "image/*",
       });
       if (result.type === "success") {
-        let file = result.file;
-        if (file != null) formData.append("file", file);
+        if (result.uri != null) {
+          console.log(result);
+          formData.append("file", result as unknown as Blob);
+        }
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getBlob = async (fileUri: string) => {
-    try {
-      const resp = await fetch(fileUri);
-      const imageBody = await resp.blob();
-      return imageBody;
-    } catch (err) {}
-  };
-
   const onSubmit = async () => {
+    console.log("eeeeee");
     await dispatch(fetchUploadPhoto(formData));
   };
 
@@ -127,15 +121,6 @@ const ProfileScreen = () => {
 
   const searchChatAsync = async () => {
     await dispatch(fetchSearchChat({ chatName: search }));
-  };
-
-  const storeData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      instance.defaults.headers.common["Authorization"] = token;
-    } catch (e) {
-      console.log(e);
-    }
   };
 
   // const dataRefresh = () => {
@@ -213,8 +198,8 @@ const ProfileScreen = () => {
                   <SearchCross onPress={() => setModalPhoto(!modalPhoto)}>
                     ⛌
                   </SearchCross>
-                  <Button onPress={() => UploadFile()} width="49%">
-                    Select
+                  <Button onPress={selectFile} width="49%">
+                    Choose photo
                   </Button>
                   <Button onPress={() => onSubmit()} width="49%">
                     Upload

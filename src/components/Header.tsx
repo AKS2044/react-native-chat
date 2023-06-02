@@ -81,7 +81,8 @@ const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
       {isAuth ? (
         <HeaderLinks>
           <TouchableOpacity
-            onPress={() => navigate("Profile", { userName: userName })}
+            // onPress={() => navigate("Profile", { userName: userName })}
+            onPress={() => navigate("Register")}
           >
             <HeaderLink>Profile</HeaderLink>
           </TouchableOpacity>

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { pickBy } from "lodash";
-import axios from "../../axios";
+import axios, { instance } from "../../axios";
 import {
   ErrorParams,
   LoginParams,
@@ -9,6 +9,7 @@ import {
   ProfilePayloadParams,
   RegisterParams,
 } from "./types";
+import { AxiosRequestConfig } from "axios";
 
 export const fetchLogin = createAsyncThunk<
   LoginPayloadParams,

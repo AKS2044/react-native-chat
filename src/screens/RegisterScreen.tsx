@@ -11,9 +11,21 @@ import {
   TitleText,
 } from "./Styles/RegisterStyle";
 import Input from "../components/input/Input";
+import { useSelector } from "react-redux";
+import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
+import { useAppDispatch } from "../redux/store";
 
 const RegisterScreen = () => {
   const { navigate } = useNavigation();
+  const isAuth = useSelector(selectIsAuth);
+  const dispatch = useAppDispatch();
+
+  const { data } = useSelector(selectLoginData);
+
+  if (isAuth) {
+    navigate("Profile", { userName: data.userName });
+  }
+
   return (
     <RegisterView>
       <BlockView>

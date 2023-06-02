@@ -73,7 +73,7 @@ const LoginScreen = () => {
     <LoginView>
       <BlockView>
         <TitleText>Log in</TitleText>
-        {statusLogin === "error" && (
+        {statusLogin === "error" && error && (
           <FlatList
             data={error}
             renderItem={({ item }) => (
