@@ -51,7 +51,7 @@ export interface LoginPayloadParams {
   id: string;
   email: string;
   roles: string[];
-  token: boolean;
+  token: string;
   userName: string;
   pathPhoto: string;
 }

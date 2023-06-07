@@ -49,7 +49,7 @@ const HeaderLink = styled.Text`
 `;
 
 type HeaderProps = {
-  userName: string;
+  userName?: string;
   chatName?: string;
 };
 

@@ -1,33 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { RootRouteProps } from "../navigation/types";
-import photoUser from "../images/RickMorti8.png";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/types";
 import smile from "../images/smiling.png";
 import Button from "../components/ui/button/Button";
 import { TouchableOpacity } from "react-native";
 import {
   ChatView,
-  DateText,
   EmojiImage,
   InputFullView,
-  MessageFullView,
-  MessagePhotoImage,
-  MessageText,
-  MessageView,
   MessagesView,
-  SearchCross,
   SmileImage,
   SmilesView,
   TextInput,
   TextView,
-  UserNameText,
 } from "./Styles/ChatStyle";
+import { MessageParams, UsersCheck } from "../redux/Chat/types";
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { selectChatData } from "../redux/Chat/selectors";
+import { useAppDispatch } from "../redux/store";
+import {
+  fetchAddMessageChat,
+  fetchGetChat,
+  fetchMessageList,
+  fetchUsersInChat,
+} from "../redux/Chat/asyncActions";
+import { selectLoginData } from "../redux/Auth/selectors";
+import Messages from "../components/messages/Messages";
 
 const ChatScreen = () => {
+  const { handleSubmit } = useForm<MessageParams>({
+    mode: "onChange",
+  });
+
+  const dispatch = useAppDispatch();
+
+  const [users, setUsers] = useState<UsersCheck[]>([]);
+  const [connection, setConnection] = useState<HubConnection>();
+  const [text, setText] = useState("");
+  const [connected, setConnected] = useState<string[]>([]);
+  const [disconnected, setDisconnected] = useState<string[]>([]);
+  const [chatik, setChatik] = useState<MessageParams[]>([]);
+  const [connectedInfo, setConnectedInfo] = useState(false);
+  const [watchAll, setWatchAll] = useState(false);
+  const [disconnectedInfo, setDisconnectedInfo] = useState(false);
+  const dateNow = Date.now();
+  const date = new Date(dateNow);
+
+  const route = useRoute<RouteProp<RootStackParamList, "Chat">>();
+  const { chatId, chatName } = route.params;
+
   const { navigate } = useNavigation();
   const [smilesOpen, setSmilesOpen] = useState(false);
   const [textInput, setTextInput] = useState("");
+  const latestChat = useRef<MessageParams[]>([]);
+  latestChat.current = chatik;
+
+  const {
+    messages,
+    chat,
+    usersChat,
+    statusDeleteMessage,
+    statusEnterChat,
+    statusChatMes,
+  } = useSelector(selectChatData);
+
+  const { statusAuth, data } = useSelector(selectLoginData);
 
   const pathSmiles = [
     { uri: require("../../assets/smiles/smile1.png") },
@@ -41,45 +81,129 @@ const ChatScreen = () => {
     { uri: require("../../assets/smiles/smile9.png") },
   ];
 
-  const route = useRoute<RootRouteProps<"Chat">>();
-  const { chatName } = route.params;
+  const getMessages = async () => {
+    await dispatch(fetchMessageList({ chatId: chatId }));
+    await dispatch(fetchGetChat({ chatId: chatId }));
+    await dispatch(fetchUsersInChat({ chatId: chatId }));
+  };
+
+  // Get messages
+  useEffect(() => {
+    getMessages();
+  }, [statusDeleteMessage, statusChatMes, statusEnterChat]);
+
+  //Hub connection builder
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl("https://localhost:7275/chat", {
+        accessTokenFactory: () => (data.token ? data.token : "Unauthorized"),
+      })
+      .withAutomaticReconnect()
+      .build();
+    setConnection(newConnection);
+  }, []);
+
+  // Сonnection
+  // useEffect(() => {
+  //   if (connection) {
+  //     connection
+  //       .start()
+  //       .then(() => {
+  //         connection.invoke("OnConnectedAsync", "chat" + chatId);
+  //       })
+  //       .then(() => {
+  //         connection.on("ConnectedAsync", (message) => {
+  //           const info: string[] = [];
+  //           if (info) {
+  //             setConnectedInfo(true);
+  //             info.push(message);
+  //             setConnected(info);
+  //             const timer = setTimeout(() => {
+  //               setConnectedInfo(false);
+  //             }, 2000);
+  //             return () => clearTimeout(timer);
+  //           }
+  //         });
+  //       })
+  //       .then(() => {
+  //         connection.on("SendCheckUsers", (message) => {
+  //           setUsers(message);
+  //         });
+  //       })
+  //       .then(() => {
+  //         connection.on("DisconnectedAsync", (message) => {
+  //           const info: string[] = [];
+  //           setDisconnectedInfo(true);
+  //           info.push(message);
+  //           setDisconnected(info);
+  //           const timer = setTimeout(() => {
+  //             setDisconnectedInfo(false);
+  //           }, 2000);
+  //           return () => clearTimeout(timer);
+  //         });
+  //       })
+  //       .then(() => {
+  //         connection.on("ReceiveMessage", (message) => {
+  //           const updatedChat: MessageParams[] = [...latestChat.current];
+  //           updatedChat.push(message);
+  //           setChatik(updatedChat);
+  //         });
+  //       })
+  //       .catch((err) => console.log("Connection failed: ", err));
+
+  //     return () => {
+  //       connection.stop();
+  //     };
+  //   }
+  // }, [connection]);
+
+  // Set messages in state "chatik" and map in Messages component
+  useEffect(() => {
+    if (messages.length) {
+      setChatik(messages);
+    }
+  }, [messages]);
+
+  const onSubmit = async () => {
+    const last = chatik.length
+      ? chatik[chatik.length - 1]
+      : messages[messages.length - 1];
+
+    const message: MessageParams = {
+      id: last.id + 1,
+      chatId: chatId,
+      userName: data.userName,
+      chatName: chat.nameChat,
+      message: text,
+      dateWrite: date.toLocaleTimeString(),
+      pathPhoto: data.pathPhoto,
+    };
+
+    await dispatch(fetchAddMessageChat(message));
+    if (connection?.start) {
+      try {
+        await connection.send("SendMessage", message);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      alert("No connection to server yet.");
+    }
+    setText("");
+  };
+
   return (
     <ChatView>
       <Header chatName={chatName} />
       <MessagesView>
-        <MessageFullView>
-          <MessagePhotoImage source={photoUser} />
-          <MessageView>
-            <UserNameText>User name</UserNameText>
-            <MessageText>
-              Hello world!Hello world!Hello world!Hello world!Hello world!Hello
-              world!Hello world!Hello world!Hello world!Hello world!Hello
-              world!Hello world!Hello world!
-            </MessageText>
-            <DateText>21.02.33</DateText>
-            <SearchCross>⛌</SearchCross>
-          </MessageView>
-        </MessageFullView>
-        <MessageFullView
-          style={{
-            flexDirection: "row-reverse",
-          }}
-        >
-          <MessagePhotoImage source={photoUser} />
-          <MessageView>
-            <UserNameText>User name</UserNameText>
-            <MessageText>Hello world!</MessageText>
-            <DateText>21.02.33</DateText>
-            <SearchCross>⛌</SearchCross>
-          </MessageView>
-        </MessageFullView>
+        <Messages messages={messages} />
       </MessagesView>
       <TextView>
         <InputFullView>
           {smilesOpen && (
             <SmilesView>
               {pathSmiles.map((item, i) => (
-                <TouchableOpacity key={i} onPress={() => navigate("Profile")}>
+                <TouchableOpacity key={i}>
                   <EmojiImage source={item.uri} />
                 </TouchableOpacity>
               ))}
@@ -100,7 +224,9 @@ const ChatScreen = () => {
             value={textInput}
           />
         </InputFullView>
-        <Button width="20%">Send</Button>
+        <Button onPress={handleSubmit(onSubmit)} width="20%">
+          Send
+        </Button>
       </TextView>
     </ChatView>
   );

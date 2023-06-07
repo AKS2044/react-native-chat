@@ -198,9 +198,7 @@ const ProfileScreen = () => {
                   <SearchCross onPress={() => setModalPhoto(!modalPhoto)}>
                     ⛌
                   </SearchCross>
-                  <Button onPress={selectFile} width="49%">
-                    Choose photo
-                  </Button>
+                  <Button width="49%">Choose photo</Button>
                   <Button onPress={() => onSubmit()} width="49%">
                     Upload
                   </Button>

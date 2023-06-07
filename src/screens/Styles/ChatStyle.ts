@@ -7,27 +7,13 @@ export const ChatView = styled.View`
   background: ${COLORS.primary};
 `;
 
-export const MessagesView = styled.View`
-  padding: 10px;
+export const InputFullView = styled.View`
   flex: 1;
 `;
 
-export const MessageFullView = styled.View`
-  margin-bottom: 10px;
-  align-items: flex-start;
-  flex-direction: row;
-`;
-
-export const MessagePhotoImage = styled.Image`
-  margin-left: 5px;
-  margin-right: 5px;
-  width: 48px;
-  border-radius: 50px;
-  border-width: 1px;
-  border-color: ${COLORS.pink};
-  height: 48px;
-`;
-export const InputFullView = styled.View`
+export const MessagesView = styled.View`
+  padding-bottom: 10px;
+  justify-content: space-between;
   flex: 1;
 `;
 
@@ -38,42 +24,6 @@ export const SmileImage = styled.Image`
   right: 11px;
   width: 22px;
   height: 22px;
-`;
-
-export const MessageView = styled.View`
-  background: rgba(244, 123, 123, 0.2);
-  padding: 3px;
-  padding-left: 5px;
-  min-width: 100px;
-  max-width: 90%;
-  min-height: 60px;
-  border-color: ${COLORS.pink};
-  border-width: 1px;
-  border-radius: 12px;
-`;
-
-export const UserNameText = styled.Text`
-  font-size: 11px;
-  opacity: 0.7;
-  color: ${COLORS.white};
-`;
-
-export const MessageText = styled.Text`
-  color: ${COLORS.white};
-`;
-
-export const DateText = styled.Text`
-  opacity: 0.6;
-  font-size: 11px;
-  color: ${COLORS.white};
-`;
-
-export const SearchCross = styled.Text`
-  position: absolute;
-  right: 8px;
-  top: -5px;
-  font-size: 20px;
-  color: ${COLORS.lightGray};
 `;
 
 export const TextView = styled.View`
