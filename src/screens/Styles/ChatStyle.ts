@@ -36,6 +36,24 @@ export const TextView = styled.View`
   background: ${COLORS.secondary};
 `;
 
+export const InfoBarView = styled.View`
+  padding: 5px;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  background: ${COLORS.secondary};
+`;
+
+export const WhoIsOnlineText = styled.Text`
+  color: ${COLORS.white};
+`;
+
+export const TextInfo = styled.Text`
+  color: ${COLORS.white};
+  margin-left: 10px;
+`;
+
 export const TextInput = styled.TextInput`
   color: ${COLORS.white};
   background: ${COLORS.primary};

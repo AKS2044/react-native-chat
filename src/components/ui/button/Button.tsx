@@ -20,13 +20,24 @@ type ButtonProps = {
   disabled?: boolean;
   children: string;
   width?: string;
+  height?: string;
   onPress?: (event: GestureResponderEvent) => void;
 };
 
-const Button: React.FC<ButtonProps> = ({ children, width, onPress }) => {
+const Button: React.FC<ButtonProps> = ({
+  children,
+  width,
+  onPress,
+  disabled,
+  height,
+}) => {
   return (
-    <ButtonPressable onPress={onPress} style={{ width }}>
-      <ButtonText>{children}</ButtonText>
+    <ButtonPressable
+      disabled={disabled}
+      onPress={onPress}
+      style={{ width, height }}
+    >
+      <ButtonText style={disabled && { opacity: 0.2 }}>{children}</ButtonText>
     </ButtonPressable>
   );
 };

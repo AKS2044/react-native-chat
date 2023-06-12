@@ -49,7 +49,7 @@ const HeaderLink = styled.Text`
 `;
 
 type HeaderProps = {
-  userName?: string;
+  userName: string;
   chatName?: string;
 };
 
@@ -57,6 +57,7 @@ const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
   const { navigate } = useNavigation();
   const dispatch = useAppDispatch();
   const isAuth = useSelector(selectIsAuth);
+
   const logoutSite = async () => {
     Alert.alert("Warning", "Do you really want to leave the chat?", [
       {
@@ -81,8 +82,7 @@ const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
       {isAuth ? (
         <HeaderLinks>
           <TouchableOpacity
-            // onPress={() => navigate("Profile", { userName: userName })}
-            onPress={() => navigate("Register")}
+            onPress={() => navigate("Profile", { userName: userName })}
           >
             <HeaderLink>Profile</HeaderLink>
           </TouchableOpacity>
