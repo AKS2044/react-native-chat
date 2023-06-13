@@ -21,6 +21,7 @@ import { LoginParams } from "../redux/Auth/types";
 import Alert from "../components/alert/Alert";
 import { FlatList } from "react-native";
 import instance from "../axios";
+import { setError } from "../redux/Auth/slice";
 
 const LoginScreen = () => {
   const { navigate } = useNavigation();
@@ -65,6 +66,10 @@ const LoginScreen = () => {
       }
     }
   }, [statusLogin]);
+
+  useEffect(() => {
+    dispatch(setError());
+  }, []);
 
   if (isAuth) {
     navigate("Profile", { userName: data.userName });
@@ -112,7 +117,7 @@ const LoginScreen = () => {
           onPress={handleSubmit(onSubmit)}
           title="Log in"
           color={COLORS.pink}
-          disabled={false}
+          disabled={!isValid}
         />
         <SubtitleView>
           <SubtitleText>

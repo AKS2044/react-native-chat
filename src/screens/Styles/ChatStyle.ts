@@ -36,13 +36,64 @@ export const TextView = styled.View`
   background: ${COLORS.secondary};
 `;
 
+export const JoinView = styled.View`
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 70px;
+  background: ${COLORS.secondary};
+`;
+
 export const InfoBarView = styled.View`
   padding: 5px;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 40px;
   background: ${COLORS.secondary};
+`;
+
+export const UsersBarView = styled.View`
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background: ${COLORS.secondary};
+`;
+
+export const UsersBarItemView = styled.View`
+  border-bottom-width: 1px;
+  border-color: ${COLORS.primary};
+  padding-left: 10px;
+  padding-right: 10px;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  height: 60px;
+  background: ${COLORS.gray};
+`;
+
+export const ItemPhotoImage = styled.Image`
+  border-width: 1px;
+  border-color: ${COLORS.pink};
+  border-radius: 50px;
+  width: 50px;
+  height: 50px;
+  background: ${COLORS.gray};
+`;
+
+export const ItemNameText = styled.Text`
+  font-size: 16px;
+  margin-left: 20px;
+  color: ${COLORS.white};
+`;
+
+export const UserIsOnlineView = styled.View`
+  margin-left: 10px;
+  border-radius: 50px;
+  width: 8px;
+  height: 8px;
 `;
 
 export const WhoIsOnlineText = styled.Text`

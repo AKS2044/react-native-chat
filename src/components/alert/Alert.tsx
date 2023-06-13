@@ -5,7 +5,8 @@ import { COLORS } from "../../constants/colors";
 const AlertView = styled.View`
   align-items: center;
   min-width: 80%;
-  height: 50px;
+  min-height: 50px;
+  padding: 5px;
   border-radius: 6px;
   border-width: 1px;
   margin-bottom: 10px;

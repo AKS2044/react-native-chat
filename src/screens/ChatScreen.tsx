@@ -4,18 +4,25 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
 import smile from "../images/smiling.png";
 import Button from "../components/ui/button/Button";
-import { FlatList, TouchableOpacity } from "react-native";
+import GestureRecognizer from "react-native-swipe-gestures";
+import { FlatList, TouchableOpacity, Animated } from "react-native";
 import {
   ChatView,
   EmojiImage,
   InfoBarView,
   InputFullView,
+  ItemNameText,
+  ItemPhotoImage,
+  JoinView,
   MessagesView,
   SmileImage,
   SmilesView,
   TextInfo,
   TextInput,
   TextView,
+  UserIsOnlineView,
+  UsersBarItemView,
+  UsersBarView,
   WhoIsOnlineText,
 } from "./Styles/ChatStyle";
 import { MessageParams, UsersCheck } from "../redux/Chat/types";
@@ -26,7 +33,9 @@ import { selectChatData } from "../redux/Chat/selectors";
 import { useAppDispatch } from "../redux/store";
 import {
   fetchAddMessageChat,
+  fetchEnterTheChat,
   fetchGetChat,
+  fetchLeaveTheChat,
   fetchMessageList,
   fetchUsersInChat,
 } from "../redux/Chat/asyncActions";
@@ -34,6 +43,7 @@ import { selectLoginData } from "../redux/Auth/selectors";
 import Messages from "../components/messages/Messages";
 import instance from "../axios";
 import Loader from "../components/loader/Loader";
+import { COLORS } from "../constants/colors";
 
 const ChatScreen = () => {
   const { handleSubmit } = useForm<MessageParams>({
@@ -60,6 +70,8 @@ const ChatScreen = () => {
   const { navigate } = useNavigation();
   const [smilesOpen, setSmilesOpen] = useState(false);
   const [textInput, setTextInput] = useState("");
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const latestChat = useRef<MessageParams[]>([]);
   latestChat.current = chatik;
 
@@ -197,14 +209,105 @@ const ChatScreen = () => {
     setTextInput("");
   };
 
+  const config = {
+    directionalOffsetThreshold: 140,
+  };
+
+  const onClickJoinChat = async () => {
+    await dispatch(fetchEnterTheChat({ userId: data.id, chatId: chatId }));
+  };
+
+  const onClickLeaveChat = async () => {
+    await dispatch(fetchLeaveTheChat({ userId: data.id, chatId: chatId }));
+  };
+
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    const timer = setTimeout(() => {
+      setWatchAll(!watchAll);
+    }, 300);
+    return () => clearTimeout(timer);
+  };
   return (
     <ChatView>
       <Header userName={data.userName} chatName={chatName} />
+      {watchAll && (
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <GestureRecognizer
+            config={config}
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "relative",
+              zIndex: 4,
+            }}
+            onSwipeUp={() => {
+              fadeOut();
+            }}
+          >
+            <UsersBarView>
+              <FlatList
+                data={usersChat}
+                renderItem={({ item }) => (
+                  <UsersBarItemView key={item.id}>
+                    <ItemPhotoImage
+                      source={{ uri: `${uri}${item.pathPhoto}` }}
+                    />
+                    <ItemNameText>{item.userName}</ItemNameText>
+                    <UserIsOnlineView
+                      style={
+                        Boolean(users.find((u) => u.userName === item.userName))
+                          ? { backgroundColor: COLORS.green }
+                          : { backgroundColor: COLORS.error }
+                      }
+                    />
+                  </UsersBarItemView>
+                )}
+              />
+            </UsersBarView>
+          </GestureRecognizer>
+        </Animated.View>
+      )}
       <InfoBarView>
         <WhoIsOnlineText>Members: {users.length}</WhoIsOnlineText>
-        <Button disabled={false} width="20%" height="100%">
-          Leave
+        <Button
+          onPress={() => {
+            fadeIn();
+            setWatchAll(!watchAll);
+          }}
+          disabled={false}
+          width="20%"
+          height="100%"
+        >
+          Open
         </Button>
+        {usersChat.find((u) => u.id === data.id) && (
+          <Button
+            onPress={() => onClickLeaveChat()}
+            disabled={false}
+            width="20%"
+            height="100%"
+          >
+            Leave
+          </Button>
+        )}
       </InfoBarView>
       <MessagesView>
         <Messages messages={chatik} />
@@ -262,7 +365,16 @@ const ChatScreen = () => {
           </Button>
         </TextView>
       ) : (
-        <TextView></TextView>
+        <JoinView>
+          <Button
+            onPress={() => onClickJoinChat()}
+            disabled={false}
+            width="40%"
+            height="50%"
+          >
+            Join
+          </Button>
+        </JoinView>
       )}
     </ChatView>
   );

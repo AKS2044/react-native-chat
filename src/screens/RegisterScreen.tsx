@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { COLORS } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -14,27 +14,115 @@ import Input from "../components/input/Input";
 import { useSelector } from "react-redux";
 import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
 import { useAppDispatch } from "../redux/store";
+import { Controller, useForm } from "react-hook-form";
+import { RegisterParams } from "../redux/Auth/types";
+import { fetchRegister } from "../redux/Auth/asyncActions";
+import { FlatList } from "react-native";
+import Alert from "../components/alert/Alert";
+import { setError } from "../redux/Auth/slice";
 
 const RegisterScreen = () => {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<RegisterParams>({
+    mode: "onChange",
+  });
   const { navigate } = useNavigation();
   const isAuth = useSelector(selectIsAuth);
   const dispatch = useAppDispatch();
 
-  const { data } = useSelector(selectLoginData);
+  const { data, statusRegister, error } = useSelector(selectLoginData);
+
+  const onSubmit = async (values: RegisterParams) => {
+    await dispatch(fetchRegister(values));
+    // if (formData.get("file")) {
+    //   await dispatch(fetchUploadPhoto(formData));
+    // }
+  };
+
+  useEffect(() => {
+    dispatch(setError());
+  }, []);
 
   if (isAuth) {
     navigate("Profile", { userName: data.userName });
   }
-
+  console.log(statusRegister);
   return (
     <RegisterView>
       <BlockView>
         <TitleText>Register</TitleText>
-        <Input placeholder="Login" />
-        <Input placeholder="E-mail" />
-        <Input placeholder="Password" password />
-        <Input placeholder="Password confirm" password />
-        <SumbitButton title="Register" color={COLORS.pink} disabled={false} />
+        {statusRegister === "error" && error && (
+          <FlatList
+            data={error}
+            renderItem={({ item }) => (
+              <Alert typeAlert="error">{item.message}</Alert>
+            )}
+          />
+        )}
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Login"
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+            />
+          )}
+          name="userName"
+        />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="E-mail"
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+            />
+          )}
+          name="email"
+        />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Password"
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+              secureTextEntry={true}
+            />
+          )}
+          name="password"
+        />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Password confirm"
+              value={value}
+              onBlur={onBlur}
+              onChange={onChange}
+              secureTextEntry={true}
+            />
+          )}
+          name="passwordConfirm"
+        />
+        <SumbitButton
+          onPress={handleSubmit(onSubmit)}
+          title="Register"
+          color={COLORS.pink}
+          disabled={!isValid}
+        />
         <SubtitleView>
           <SubtitleText>
             Log in:{" "}

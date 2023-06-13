@@ -92,10 +92,10 @@ const Messages: React.FC<MessagesType> = ({ messages }) => {
   const OnClickDeleteMessage = (messageId: number) => {
     dispatch(fetchDeleteMessage({ messageId }));
   };
-
   return (
     <FlatList
       inverted
+      keyExtractor={(item) => String(item.id)}
       style={{ padding: 10 }}
       data={[...messages].reverse()}
       renderItem={({ item }) => (
@@ -128,7 +128,6 @@ const Messages: React.FC<MessagesType> = ({ messages }) => {
           <MessagePhotoImage source={{ uri: `${uri}${item.pathPhoto}` }} />
         </MessageFullView>
       )}
-      keyExtractor={(item) => String(item.id)}
     />
   );
 };

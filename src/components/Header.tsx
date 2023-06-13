@@ -15,6 +15,7 @@ const HeaderView = styled.View`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
+  z-index: 4;
   width: 100%;
   height: 50px;
   background-color: ${COLORS.pink};

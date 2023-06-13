@@ -32,7 +32,13 @@ const initialState: LoginState = {
 export const loginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {},
+  reducers: {
+    setError: (state) => {
+      state.statusRegister = Status.LOADING;
+      state.statusLogin = Status.LOADING;
+      state.error = [];
+    },
+  },
   // fetchLogin builder
   extraReducers: (builder) => {
     builder.addCase(fetchLogin.pending, (state) => {
@@ -115,6 +121,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const {} = loginSlice.actions;
+export const { setError } = loginSlice.actions;
 
 export default loginSlice.reducer;
