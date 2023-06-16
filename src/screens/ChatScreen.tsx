@@ -33,6 +33,7 @@ import { selectChatData } from "../redux/Chat/selectors";
 import { useAppDispatch } from "../redux/store";
 import {
   fetchAddMessageChat,
+  fetchDeleteChat,
   fetchEnterTheChat,
   fetchGetChat,
   fetchLeaveTheChat,
@@ -83,6 +84,7 @@ const ChatScreen = () => {
     statusEnterChat,
     statusChatMes,
     statusGetMessagesChat,
+    statusDeleteChat,
   } = useSelector(selectChatData);
 
   const { statusAuth, data } = useSelector(selectLoginData);
@@ -221,6 +223,13 @@ const ChatScreen = () => {
     await dispatch(fetchLeaveTheChat({ userId: data.id, chatId: chatId }));
   };
 
+  const onPressDeleteChat = async () => {
+    await dispatch(fetchDeleteChat({ chatId })).then(() => {
+      if (statusDeleteChat === "completed")
+        navigate("Profile", { userName: data.userName });
+    });
+  };
+
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -241,6 +250,7 @@ const ChatScreen = () => {
     }, 300);
     return () => clearTimeout(timer);
   };
+
   return (
     <ChatView>
       <Header userName={data.userName} chatName={chatName} />
@@ -266,19 +276,27 @@ const ChatScreen = () => {
               <FlatList
                 data={usersChat}
                 renderItem={({ item }) => (
-                  <UsersBarItemView key={item.id}>
-                    <ItemPhotoImage
-                      source={{ uri: `${uri}${item.pathPhoto}` }}
-                    />
-                    <ItemNameText>{item.userName}</ItemNameText>
-                    <UserIsOnlineView
-                      style={
-                        Boolean(users.find((u) => u.userName === item.userName))
-                          ? { backgroundColor: COLORS.green }
-                          : { backgroundColor: COLORS.error }
-                      }
-                    />
-                  </UsersBarItemView>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigate("Profile", { userName: item.userName })
+                    }
+                  >
+                    <UsersBarItemView key={item.id}>
+                      <ItemPhotoImage
+                        source={{ uri: `${uri}${item.pathPhoto}` }}
+                      />
+                      <ItemNameText>{item.userName}</ItemNameText>
+                      <UserIsOnlineView
+                        style={
+                          Boolean(
+                            users.find((u) => u.userName === item.userName)
+                          )
+                            ? { backgroundColor: COLORS.green }
+                            : { backgroundColor: COLORS.error }
+                        }
+                      />
+                    </UsersBarItemView>
+                  </TouchableOpacity>
                 )}
               />
             </UsersBarView>
@@ -298,6 +316,17 @@ const ChatScreen = () => {
         >
           Open
         </Button>
+        {(chat.chatCreator === data.id ||
+          data.roles.find((r) => r === "ADMIN")) && (
+          <Button
+            onPress={() => onPressDeleteChat()}
+            disabled={false}
+            width="20%"
+            height="100%"
+          >
+            Delete
+          </Button>
+        )}
         {usersChat.find((u) => u.id === data.id) && (
           <Button
             onPress={() => onClickLeaveChat()}
@@ -360,6 +389,7 @@ const ChatScreen = () => {
             disabled={!Boolean(textInput)}
             onPress={handleSubmit(onSubmit)}
             width="20%"
+            height={40}
           >
             Send
           </Button>

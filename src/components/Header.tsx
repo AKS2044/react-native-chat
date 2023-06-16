@@ -1,5 +1,5 @@
 import styled from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../constants/colors";
 import logout from "../images/logout.png";
 import { Alert, TouchableOpacity } from "react-native";
@@ -58,6 +58,7 @@ const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
   const { navigate } = useNavigation();
   const dispatch = useAppDispatch();
   const isAuth = useSelector(selectIsAuth);
+  const route = useRoute();
 
   const logoutSite = async () => {
     Alert.alert("Warning", "Do you really want to leave the chat?", [
@@ -82,14 +83,14 @@ const Header: React.FC<HeaderProps> = ({ userName, chatName }) => {
       </TouchableOpacity>
       {isAuth ? (
         <HeaderLinks>
-          <TouchableOpacity
-            onPress={() => navigate("Profile", { userName: userName })}
-          >
-            <HeaderLink>Profile</HeaderLink>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate("Main")}>
-            <HeaderLink>{chatName}</HeaderLink>
-          </TouchableOpacity>
+          {route.name !== "Profile" && (
+            <TouchableOpacity
+              onPress={() => navigate("Profile", { userName: userName })}
+            >
+              <HeaderLink>Profile</HeaderLink>
+            </TouchableOpacity>
+          )}
+          {route.name === "Chat" && <HeaderLink>{chatName}</HeaderLink>}
           <TouchableOpacity onPress={() => logoutSite()}>
             <HeaderImage source={logout} />
           </TouchableOpacity>

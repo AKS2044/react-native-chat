@@ -19,8 +19,8 @@ const ButtonText = styled.Text`
 type ButtonProps = {
   disabled?: boolean;
   children: string;
-  width?: string;
-  height?: string;
+  width?: string | number | undefined;
+  height?: string | number | undefined;
   onPress?: (event: GestureResponderEvent) => void;
 };
 

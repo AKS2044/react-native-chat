@@ -50,7 +50,7 @@ const RegisterScreen = () => {
   if (isAuth) {
     navigate("Profile", { userName: data.userName });
   }
-  console.log(statusRegister);
+
   return (
     <RegisterView>
       <BlockView>

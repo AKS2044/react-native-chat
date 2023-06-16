@@ -6,9 +6,10 @@ import { useSelector } from "react-redux";
 import { selectLoginData } from "../../redux/Auth/selectors";
 import { fetchDeleteMessage } from "../../redux/Chat/asyncActions";
 import { MessageParams } from "../../redux/Chat/types";
-import { FlatList } from "react-native";
+import { FlatList, TouchableOpacity } from "react-native";
 import instance from "../../axios";
 import reactStringReplace from "react-string-replace";
+import { useNavigation } from "@react-navigation/native";
 
 export const MessageFullView = styled.View`
   margin-top: 20px;
@@ -86,6 +87,7 @@ const Messages: React.FC<MessagesType> = ({ messages }) => {
   ];
 
   const dispatch = useAppDispatch();
+  const { navigate } = useNavigation();
   const uri = instance.getUri().slice(0, -4);
   const { data } = useSelector(selectLoginData);
 
@@ -125,7 +127,11 @@ const Messages: React.FC<MessagesType> = ({ messages }) => {
               </SearchCross>
             )}
           </MessageView>
-          <MessagePhotoImage source={{ uri: `${uri}${item.pathPhoto}` }} />
+          <TouchableOpacity
+            onPress={() => navigate("Profile", { userName: item.userName })}
+          >
+            <MessagePhotoImage source={{ uri: `${uri}${item.pathPhoto}` }} />
+          </TouchableOpacity>
         </MessageFullView>
       )}
     />

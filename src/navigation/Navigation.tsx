@@ -9,7 +9,7 @@ import ChatScreen from "../screens/ChatScreen";
 import { COLORS } from "../constants/colors";
 import { useAppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
-import { selectLoginData } from "../redux/Auth/selectors";
+import { selectIsAuth, selectLoginData } from "../redux/Auth/selectors";
 import { fetchAuth } from "../redux/Auth/asyncActions";
 import { useEffect } from "react";
 
@@ -17,6 +17,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const Navigation = () => {
   const dispatch = useAppDispatch();
+  const isAuth = useSelector(selectIsAuth);
   const { statusLogin, statusRegister } = useSelector(selectLoginData);
 
   useEffect(() => {
@@ -28,31 +29,43 @@ export const Navigation = () => {
         screenOptions={{ headerStyle: { backgroundColor: COLORS.pink } }}
         initialRouteName="Main"
       >
-        <Stack.Screen
-          name="Main"
-          component={MainScreen}
-          options={{ title: "Main" }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ title: "Login" }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{ title: "Register" }}
-        />
-        <Stack.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{ title: "Profile" }}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={ChatScreen}
-          options={{ title: "Chat" }}
-        />
+        {isAuth ? (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainScreen}
+              options={{ title: "Main" }}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={{ title: "Profile" }}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={ChatScreen}
+              options={{ title: "Chat" }}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainScreen}
+              options={{ title: "Main" }}
+            />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ title: "Login" }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{ title: "Register" }}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

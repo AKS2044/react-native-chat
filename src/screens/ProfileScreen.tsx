@@ -153,7 +153,7 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     getProfile();
-  }, [statusEnterChat, statusLeaveChat, statusAuth, statusAddChat]);
+  }, [statusEnterChat, statusLeaveChat, statusAuth, statusAddChat, userName]);
 
   useEffect(() => {
     if (search) {
@@ -198,8 +198,10 @@ const ProfileScreen = () => {
                   <SearchCross onPress={() => setModalPhoto(!modalPhoto)}>
                     ⛌
                   </SearchCross>
-                  <Button width="49%">Choose photo</Button>
-                  <Button onPress={() => onSubmit()} width="49%">
+                  <Button width="49%" height={40}>
+                    Choose photo
+                  </Button>
+                  <Button width="49%" height={40} onPress={() => onSubmit()}>
                     Upload
                   </Button>
                 </>
@@ -235,30 +237,40 @@ const ProfileScreen = () => {
             </ProfileItemsView>
           </BlockView>
           <ButtonsView>
-            <Button onPress={() => setModal(!modal)} width="49%">
+            <Button onPress={() => setModal(!modal)} width="49%" height={40}>
               Create chat
             </Button>
-            <Button onPress={() => setModalPhoto(!modalPhoto)} width="49%">
+            <Button
+              onPress={() => setModalPhoto(!modalPhoto)}
+              width="49%"
+              height={40}
+            >
               Change photo
             </Button>
           </ButtonsView>
           <TitleBlockView>
-            <TitleText>My chats</TitleText>
+            {data.userName === userName ? (
+              <TitleText>My chats</TitleText>
+            ) : (
+              <TitleText>{`${userName}'s chats`}</TitleText>
+            )}
           </TitleBlockView>
-          <SearchView
-            style={
-              search && isKeyboardVisible
-                ? { position: "absolute", width: "100%" }
-                : { position: "relative" }
-            }
-          >
-            <SearchInput
-              placeholder="Search..."
-              value={search}
-              onChangeText={(text) => setSearch(text)}
-            />
-            <SearchCross onPress={() => setSearch("")}>⛌</SearchCross>
-          </SearchView>
+          {data.userName === userName && (
+            <SearchView
+              style={
+                search && isKeyboardVisible
+                  ? { position: "absolute", width: "100%" }
+                  : { position: "relative" }
+              }
+            >
+              <SearchInput
+                placeholder="Search..."
+                value={search}
+                onChangeText={(text) => setSearch(text)}
+              />
+              <SearchCross onPress={() => setSearch("")}>⛌</SearchCross>
+            </SearchView>
+          )}
           <ChatsView
             style={
               search && isKeyboardVisible

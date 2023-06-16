@@ -5,6 +5,7 @@ export interface ChatState {
   usersChat: UsersChatPayloadParams[];
   chat: ChatParams;
   searchChat: ChatParams[];
+  statusDeleteChat: Status;
   statusEnterChat: Status;
   statusLeaveChat: Status;
   statusSearchChat: Status;

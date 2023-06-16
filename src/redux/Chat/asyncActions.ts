@@ -64,6 +64,19 @@ export const fetchDeleteMessage = createAsyncThunk<
   return data;
 });
 
+export const fetchDeleteChat = createAsyncThunk<string, { chatId: number }>(
+  "chat/fetchDeleteChatStatus",
+  async (params) => {
+    const { chatId } = params;
+    const { data } = await axios.delete("/Chat/chatDel", {
+      params: pickBy({
+        chatId,
+      }),
+    });
+    return data;
+  }
+);
+
 export const fetchMessageList = createAsyncThunk<
   MessageParams[],
   { chatId: number }

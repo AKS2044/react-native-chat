@@ -4,6 +4,7 @@ import {
   fetchAddMessageChat,
   fetchChatsUser,
   fetchCreateChat,
+  fetchDeleteChat,
   fetchDeleteMessage,
   fetchEnterTheChat,
   fetchGetChat,
@@ -20,6 +21,7 @@ const initialState: ChatState = {
   usersChat: [],
   chat: {} as ChatParams,
   searchChat: [],
+  statusDeleteChat: Status.LOADING,
   statusEnterChat: Status.LOADING,
   statusLeaveChat: Status.LOADING,
   statusSearchChat: Status.LOADING,
@@ -141,6 +143,16 @@ export const chatSlice = createSlice({
     });
     builder.addCase(fetchLeaveTheChat.rejected, (state) => {
       state.statusLeaveChat = Status.ERROR;
+    });
+    // fetchDeleteChat builder
+    builder.addCase(fetchDeleteChat.pending, (state) => {
+      state.statusDeleteChat = Status.LOADING;
+    });
+    builder.addCase(fetchDeleteChat.fulfilled, (state) => {
+      state.statusDeleteChat = Status.SUCCESS;
+    });
+    builder.addCase(fetchDeleteChat.rejected, (state) => {
+      state.statusDeleteChat = Status.ERROR;
     });
   },
 });
