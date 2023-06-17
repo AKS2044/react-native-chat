@@ -9,7 +9,6 @@ import {
   ProfilePayloadParams,
   RegisterParams,
 } from "./types";
-import { AxiosRequestConfig } from "axios";
 
 export const fetchLogin = createAsyncThunk<
   LoginPayloadParams,
@@ -73,13 +72,24 @@ export const fetchGetProfile = createAsyncThunk<
   }
 });
 
-export const fetchUploadPhoto = createAsyncThunk<string, FormData>(
-  "login/fetchUploadPhotoStatus",
-  async (formData) => {
-    const { data } = await axios.post("/User/uploadPhoto", formData);
-    return data;
-  }
-);
+export const fetchUploadPhoto = createAsyncThunk<
+  string,
+  { formData: FormData; token: string }
+>("login/fetchUploadPhotoStatus", async (params) => {
+  const { formData, token } = params;
+  const response: any = await fetch(`${instance.getUri()}/User/uploadPhoto`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+      Authorization: token,
+    },
+    body: formData,
+  })
+    .then((res) => res.json())
+    .then((json: { message: string }) => {});
+  return response;
+});
 
 export const fetchLogout = createAsyncThunk<string, LogoutParams>(
   "login/fetchLogoutStatus",

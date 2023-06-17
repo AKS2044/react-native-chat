@@ -42,8 +42,7 @@ import { AddChatParams, SearchParams } from "../redux/Chat/types";
 import ItemChat from "../components/itemChat/ItemChat";
 import Modal from "../components/modal/Modal";
 import { COLORS } from "../constants/colors";
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 
 const ProfileScreen = () => {
   const uri = instance.getUri().slice(0, -4);
@@ -74,32 +73,53 @@ const ProfileScreen = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [timer, setTimer] = useState(false);
   const [modal, setModal] = useState(false);
+  const [uploadError, setUploadError] = useState<{ message: string }>();
   const [modalPhoto, setModalPhoto] = useState(false);
   const [search, setSearch] = useState("");
   const [addChat, setAddChat] = useState("");
   const { navigate } = useNavigation();
+  const [response, setResponse] = useState<any>(null);
 
-  const UploadFile = async () => {
-    try {
-      let result = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-        type: "image/*",
-      });
-      if (result.type === "success") {
-        if (result.uri != null) {
-          console.log(result);
-          formData.append("file", result as unknown as Blob);
-        }
-      }
-    } catch (error) {
-      console.log(error);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    });
+
+    if (result.assets) {
+      let photo = {
+        uri: result.assets[0].uri,
+        type: "image/jpeg",
+        name: result.assets[0].uri.replace(/.*ImagePicker./, ""),
+      };
+      formData.append("file", photo as unknown as File);
     }
   };
 
   const onSubmit = async () => {
-    console.log("eeeeee");
-    await dispatch(fetchUploadPhoto(formData));
+    await dispatch(fetchUploadPhoto({ formData, token: data.token }));
+    // fetch(`${uri}/api/User/uploadPhoto`, {
+    //   method: "POST",
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "multipart/form-data",
+    //     Authorization: "",
+    //   },
+    //   body: formData,
+    // })
+    //   .then((res) => res.json())
+    //   .then((json: { message: string }) => {
+    //     setUploadError(json);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
+
+  if (uploadError) {
+    alert(uploadError.message);
+  }
 
   const getProfile = async () => {
     if (userName) {
@@ -198,7 +218,7 @@ const ProfileScreen = () => {
                   <SearchCross onPress={() => setModalPhoto(!modalPhoto)}>
                     ⛌
                   </SearchCross>
-                  <Button width="49%" height={40}>
+                  <Button width="49%" height={40} onPress={() => pickImage()}>
                     Choose photo
                   </Button>
                   <Button width="49%" height={40} onPress={() => onSubmit()}>
