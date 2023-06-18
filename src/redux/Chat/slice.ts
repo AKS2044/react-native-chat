@@ -13,7 +13,7 @@ import {
   fetchSearchChat,
   fetchUsersInChat,
 } from "./asyncActions";
-import { ChatParams, ChatState } from "./types";
+import { ChatParams, ChatState, ErrorParams } from "./types";
 
 const initialState: ChatState = {
   messages: [],
@@ -21,13 +21,14 @@ const initialState: ChatState = {
   usersChat: [],
   chat: {} as ChatParams,
   searchChat: [],
-  statusDeleteChat: Status.LOADING,
+  createChatError: {} as ErrorParams,
+  statusDeleteChat: Status.EMPTY,
   statusEnterChat: Status.LOADING,
   statusLeaveChat: Status.LOADING,
   statusSearchChat: Status.LOADING,
   statusUsersChat: Status.LOADING,
   statusGetMessagesChat: Status.LOADING,
-  statusDeleteMessage: Status.LOADING,
+  statusDeleteMessage: Status.EMPTY,
   statusGetChat: Status.LOADING,
   statusUserChats: Status.LOADING,
   statusChatMes: Status.LOADING,
@@ -37,7 +38,12 @@ const initialState: ChatState = {
 export const chatSlice = createSlice({
   name: "chat",
   initialState,
-  reducers: {},
+  reducers: {
+    setErrorCreateChat: (state) => {
+      state.statusAddChat = Status.LOADING;
+      state.createChatError = {} as ErrorParams;
+    },
+  },
   extraReducers: (builder) => {
     // fetchCreateChat builder
     builder.addCase(fetchCreateChat.pending, (state) => {
@@ -46,8 +52,11 @@ export const chatSlice = createSlice({
     builder.addCase(fetchCreateChat.fulfilled, (state) => {
       state.statusAddChat = Status.SUCCESS;
     });
-    builder.addCase(fetchCreateChat.rejected, (state) => {
+    builder.addCase(fetchCreateChat.rejected, (state, action) => {
       state.statusAddChat = Status.ERROR;
+      state.createChatError = action.payload
+        ? action.payload
+        : ({} as ErrorParams);
     });
     // fetchAddMessageChat builder
     builder.addCase(fetchAddMessageChat.pending, (state) => {
@@ -157,6 +166,6 @@ export const chatSlice = createSlice({
   },
 });
 
-export const {} = chatSlice.actions;
+export const { setErrorCreateChat } = chatSlice.actions;
 
 export default chatSlice.reducer;

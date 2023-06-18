@@ -5,7 +5,12 @@ import { RootStackParamList } from "../navigation/types";
 import smile from "../images/smiling.png";
 import Button from "../components/ui/button/Button";
 import GestureRecognizer from "react-native-swipe-gestures";
-import { FlatList, TouchableOpacity, Animated } from "react-native";
+import {
+  FlatList,
+  TouchableOpacity,
+  Animated,
+  ActivityIndicator,
+} from "react-native";
 import {
   ChatView,
   EmojiImage,
@@ -43,7 +48,6 @@ import {
 import { selectLoginData } from "../redux/Auth/selectors";
 import Messages from "../components/messages/Messages";
 import instance from "../axios";
-import Loader from "../components/loader/Loader";
 import { COLORS } from "../constants/colors";
 
 const ChatScreen = () => {
@@ -82,12 +86,10 @@ const ChatScreen = () => {
     usersChat,
     statusDeleteMessage,
     statusEnterChat,
-    statusChatMes,
-    statusGetMessagesChat,
     statusDeleteChat,
   } = useSelector(selectChatData);
 
-  const { statusAuth, data } = useSelector(selectLoginData);
+  const { data } = useSelector(selectLoginData);
 
   const pathSmiles = [
     { uri: require("../images/smiles/smile1.png"), smile: "smile1" },
@@ -253,6 +255,20 @@ const ChatScreen = () => {
 
   return (
     <ChatView>
+      {statusDeleteMessage === "loading" && (
+        <ActivityIndicator
+          size="large"
+          style={{
+            position: "absolute",
+            zIndex: 5,
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: COLORS.bgModal,
+          }}
+        />
+      )}
       <Header userName={data.userName} chatName={chatName} />
       {watchAll && (
         <Animated.View

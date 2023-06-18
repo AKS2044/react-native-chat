@@ -3,9 +3,10 @@ import Header from "../components/Header";
 import Button from "../components/ui/button/Button";
 import {
   FlatList,
-  RefreshControl,
   TouchableOpacity,
   Keyboard,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import Loader from "../components/loader/Loader";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
@@ -37,48 +38,44 @@ import {
   fetchSearchChat,
 } from "../redux/Chat/asyncActions";
 import instance from "../axios";
-import { useForm } from "react-hook-form";
-import { AddChatParams, SearchParams } from "../redux/Chat/types";
+import { AddChatParams } from "../redux/Chat/types";
 import ItemChat from "../components/itemChat/ItemChat";
 import Modal from "../components/modal/Modal";
 import { COLORS } from "../constants/colors";
 import * as ImagePicker from "expo-image-picker";
+import { setErrorCreateChat } from "../redux/Chat/slice";
+import { setuploadPhotoError } from "../redux/Auth/slice";
 
 const ProfileScreen = () => {
   const uri = instance.getUri().slice(0, -4);
   const formData = new FormData();
   const dispatch = useAppDispatch();
   const isAuth = useSelector(selectIsAuth);
-  const { profile, profileStatus, data, statusAuth, statusLogout } =
-    useSelector(selectLoginData);
+  const {
+    profile,
+    profileStatus,
+    data,
+    statusAuth,
+    uploadPhotoError,
+    uploadPhotoStatus,
+  } = useSelector(selectLoginData);
   const {
     userChats,
     statusAddChat,
     searchChat,
     statusEnterChat,
     statusLeaveChat,
+    createChatError,
   } = useSelector(selectChatData);
-
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm({
-    mode: "onSubmit",
-  });
 
   const route = useRoute<RouteProp<RootStackParamList, "Profile">>();
   const { userName } = route.params;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [timer, setTimer] = useState(false);
   const [modal, setModal] = useState(false);
-  const [uploadError, setUploadError] = useState<{ message: string }>();
   const [modalPhoto, setModalPhoto] = useState(false);
   const [search, setSearch] = useState("");
   const [addChat, setAddChat] = useState("");
   const { navigate } = useNavigation();
-  const [response, setResponse] = useState<any>(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -99,27 +96,38 @@ const ProfileScreen = () => {
 
   const onSubmit = async () => {
     await dispatch(fetchUploadPhoto({ formData, token: data.token }));
-    // fetch(`${uri}/api/User/uploadPhoto`, {
-    //   method: "POST",
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "multipart/form-data",
-    //     Authorization: "",
-    //   },
-    //   body: formData,
-    // })
-    //   .then((res) => res.json())
-    //   .then((json: { message: string }) => {
-    //     setUploadError(json);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    await dispatch(fetchGetProfile({ userName: userName }));
+    setModalPhoto(!modalPhoto);
   };
 
-  if (uploadError) {
-    alert(uploadError.message);
-  }
+  useEffect(() => {
+    if (createChatError.message) {
+      Alert.alert("Warning", createChatError.message, [
+        {
+          text: "OK",
+          onPress: async () => {
+            await dispatch(setErrorCreateChat());
+          },
+        },
+      ]);
+    }
+
+    if (uploadPhotoError.message) {
+      Alert.alert("Warning", uploadPhotoError.message, [
+        {
+          text: "OK",
+          onPress: async () => {
+            await dispatch(setuploadPhotoError());
+          },
+        },
+      ]);
+    }
+  }, [createChatError]);
+
+  useEffect(() => {
+    dispatch(setErrorCreateChat());
+    dispatch(setuploadPhotoError());
+  }, []);
 
   const getProfile = async () => {
     if (userName) {
@@ -135,6 +143,7 @@ const ProfileScreen = () => {
     if (addChat) {
       const chat: AddChatParams = { nameChat: addChat };
       await dispatch(fetchCreateChat(chat));
+      setAddChat("");
       setModal(!modal);
     }
   };
@@ -142,14 +151,6 @@ const ProfileScreen = () => {
   const searchChatAsync = async () => {
     await dispatch(fetchSearchChat({ chatName: search }));
   };
-
-  // const dataRefresh = () => {
-  //   SetTimer(true);
-  //   const timer = setTimeout(() => {
-  //     SetTimer(false);
-  //   }, 1000);
-  //   return () => clearTimeout(timer);
-  // };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -181,13 +182,10 @@ const ProfileScreen = () => {
     }
   }, [search]);
 
-  if (timer) {
-    <Loader />;
-  }
-
   if (!isAuth) {
     navigate("Login");
   }
+
   return (
     <>
       {profileStatus === "completed" ? (
@@ -203,7 +201,11 @@ const ProfileScreen = () => {
                     placeholder="Enter the name"
                   />
                   <SearchCross onPress={() => setModal(!modal)}>⛌</SearchCross>
-                  <Button onPress={() => onClickCreateChat()} width="49%">
+                  <Button
+                    onPress={() => onClickCreateChat()}
+                    width="49%"
+                    height={40}
+                  >
                     Create chat
                   </Button>
                 </>
@@ -228,6 +230,20 @@ const ProfileScreen = () => {
               }
               title="Change your avatar"
             ></Modal>
+          )}
+          {uploadPhotoStatus === "loading" && (
+            <ActivityIndicator
+              size="large"
+              style={{
+                position: "absolute",
+                zIndex: 5,
+                top: 0,
+                right: 0,
+                left: 0,
+                bottom: 0,
+                backgroundColor: COLORS.bgModal,
+              }}
+            />
           )}
           <Header userName={data.userName} />
           <BlockView>
@@ -306,7 +322,6 @@ const ProfileScreen = () => {
             {search ? (
               <FlatList
                 data={searchChat}
-                refreshControl={<RefreshControl refreshing={timer} />}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() =>
@@ -328,7 +343,6 @@ const ProfileScreen = () => {
             ) : (
               <FlatList
                 data={userChats}
-                refreshControl={<RefreshControl refreshing={timer} />}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() =>

@@ -20,8 +20,9 @@ const initialState: LoginState = {
   error: [],
   profile: {} as ProfilePayloadParams,
   urlPhoto: "",
+  uploadPhotoError: {} as ErrorParams,
   serverError: {} as ErrorParams,
-  uploadPhotoStatus: Status.LOADING,
+  uploadPhotoStatus: Status.EMPTY,
   profileStatus: Status.LOADING,
   statusLogin: Status.LOADING,
   statusAuth: Status.LOADING,
@@ -37,6 +38,10 @@ export const loginSlice = createSlice({
       state.statusRegister = Status.LOADING;
       state.statusLogin = Status.LOADING;
       state.error = [];
+    },
+    setuploadPhotoError: (state) => {
+      state.uploadPhotoStatus = Status.EMPTY;
+      state.uploadPhotoError = {} as ErrorParams;
     },
   },
   // fetchLogin builder
@@ -115,12 +120,15 @@ export const loginSlice = createSlice({
       state.uploadPhotoStatus = Status.SUCCESS;
       state.urlPhoto = action.payload;
     });
-    builder.addCase(fetchUploadPhoto.rejected, (state) => {
+    builder.addCase(fetchUploadPhoto.rejected, (state, action) => {
       state.uploadPhotoStatus = Status.ERROR;
+      state.uploadPhotoError = action.payload
+        ? action.payload
+        : ({} as ErrorParams);
     });
   },
 });
 
-export const { setError } = loginSlice.actions;
+export const { setError, setuploadPhotoError } = loginSlice.actions;
 
 export default loginSlice.reducer;

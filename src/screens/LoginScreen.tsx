@@ -30,10 +30,9 @@ const LoginScreen = () => {
 
   const { data, statusLogin, error } = useSelector(selectLoginData);
   const {
-    register,
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<LoginParams>({
     mode: "onChange",
   });

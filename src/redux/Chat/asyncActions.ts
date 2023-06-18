@@ -7,15 +7,21 @@ import {
   AddChatParams,
   UsersChatPayloadParams,
   EnterLeaveChatPayloadParams,
+  ErrorParams,
 } from "./types";
 
-export const fetchCreateChat = createAsyncThunk<string, AddChatParams>(
-  "chat/fetchCreateChatStatus",
-  async (params) => {
+export const fetchCreateChat = createAsyncThunk<
+  string,
+  AddChatParams,
+  { rejectValue: ErrorParams }
+>("chat/fetchCreateChatStatus", async (params, { rejectWithValue }) => {
+  try {
     const { data } = await axios.post("/Chat/addChat", params);
     return data;
+  } catch (err: any) {
+    return rejectWithValue(err.response.data);
   }
-);
+});
 
 export const fetchAddMessageChat = createAsyncThunk<string, MessageParams>(
   "chat/fetchAddMessageChatStatus",

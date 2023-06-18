@@ -23,10 +23,9 @@ import { setError } from "../redux/Auth/slice";
 
 const RegisterScreen = () => {
   const {
-    register,
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<RegisterParams>({
     mode: "onChange",
   });
@@ -38,9 +37,6 @@ const RegisterScreen = () => {
 
   const onSubmit = async (values: RegisterParams) => {
     await dispatch(fetchRegister(values));
-    // if (formData.get("file")) {
-    //   await dispatch(fetchUploadPhoto(formData));
-    // }
   };
 
   useEffect(() => {

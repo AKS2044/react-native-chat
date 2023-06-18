@@ -4,6 +4,7 @@ export interface ChatState {
   userChats: ChatParams[];
   usersChat: UsersChatPayloadParams[];
   chat: ChatParams;
+  createChatError: ErrorParams;
   searchChat: ChatParams[];
   statusDeleteChat: Status;
   statusEnterChat: Status;
@@ -26,6 +27,10 @@ export interface MessageParams {
   dateWrite: string;
   pathPhoto: string;
 }
+export interface ErrorParams {
+  message: string;
+}
+
 export interface ChatParams {
   id: number;
   nameChat: string;

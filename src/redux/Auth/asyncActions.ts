@@ -74,21 +74,30 @@ export const fetchGetProfile = createAsyncThunk<
 
 export const fetchUploadPhoto = createAsyncThunk<
   string,
-  { formData: FormData; token: string }
->("login/fetchUploadPhotoStatus", async (params) => {
-  const { formData, token } = params;
-  const response: any = await fetch(`${instance.getUri()}/User/uploadPhoto`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "multipart/form-data",
-      Authorization: token,
-    },
-    body: formData,
-  })
-    .then((res) => res.json())
-    .then((json: { message: string }) => {});
-  return response;
+  { formData: FormData; token: string },
+  { rejectValue: ErrorParams }
+>("login/fetchUploadPhotoStatus", async (params, { rejectWithValue }) => {
+  try {
+    const { formData, token } = params;
+    const response: any = await fetch(`${instance.getUri()}/User/uploadPhoto`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      },
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((json: { message: string }) => {});
+    return response;
+  } catch (err: any) {
+    const errorResponse: ErrorParams = {
+      status: err.response?.status,
+      message: err.response?.data.message,
+    };
+    return rejectWithValue(errorResponse);
+  }
 });
 
 export const fetchLogout = createAsyncThunk<string, LogoutParams>(

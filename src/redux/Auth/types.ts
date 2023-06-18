@@ -5,6 +5,7 @@ export interface LoginState {
   error: { message: string }[];
   profile: ProfilePayloadParams;
   serverError: ErrorParams;
+  uploadPhotoError: ErrorParams;
   profileStatus: Status;
   urlPhoto: string;
   uploadPhotoStatus: Status;
